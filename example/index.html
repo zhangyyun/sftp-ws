@@ -94,7 +94,7 @@
                 }
 
                 if (item.stats.isFile()) {
-                    div.onclick = function () { downloadImage(path, item.filename); }
+                    div.onclick = function () { client.download(path+item.filename); }
                 }
 
                 list.appendChild(div);

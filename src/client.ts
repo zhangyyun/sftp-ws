@@ -770,6 +770,7 @@ export class SftpClient extends SftpClientCore {
 
     private _bound: boolean;
     private _term: Terminal;
+    private _close: (err: SftpError) => void;
 
     constructor(term: Terminal) {
         super();
@@ -834,9 +835,17 @@ export class SftpClient extends SftpClientCore {
         });
 
         channel.on("close", (err: SftpError) => {
+            this._log.error("channel closed %s", err.message);
             this.end();
             this._bound = false;
+
+            if (this._close != null)
+                this._close(err);
         });
+    }
+
+    onclose(func: (err: SftpError) => void) {
+        this._close = func;
     }
 
     list(path: string, callback: (err: SftpError, items: IItem[]) => void): void {
@@ -884,7 +893,7 @@ export class SftpClient extends SftpClientCore {
                        if (err) {
                             that.close(h, (err) => {
                                 if (err)
-                                   that._log.error("upload close handle failed %s", err.message);
+                                    that._log.error("upload close handle failed %s", err.message);
                             });
                             callback(err);
                             return;
@@ -896,7 +905,7 @@ export class SftpClient extends SftpClientCore {
                         if (left == 0) {
                             that.close(h, (err) => {
                                 if (err)
-                                   that._log.error("upload close handle failed %s", err.message);
+                                    that._log.error("upload close handle failed %s", err.message);
                             });
                             callback(null);
                             return;
@@ -914,5 +923,19 @@ export class SftpClient extends SftpClientCore {
                 });
             })
         }
+    }
+
+    download(path: string): void {
+        this.open(path, "r", null, (err, h) => {
+            let len = 10;
+            let ptr = new Uint8Array(len);
+            this.read(h, ptr, 0, len, 0, (err, data) => {
+                this._log.error("download is forbidden, error expected %s", err.message);
+                this.close(h, (err) => {
+                    if (err)
+                        this._log.error("download close handle failed %s", err.message);
+                });
+            });
+        });
     }
 }
