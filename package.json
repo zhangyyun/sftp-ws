@@ -32,7 +32,8 @@
     "webpack-cli": "^4.9.1"
   },
   "dependencies": {
-    "xterm": "^4.15.0",
-    "xterm-addon-fit": "^0.5.0"
+    "xterm": "^4.17.0",
+    "xterm-addon-fit": "^0.5.0",
+    "xterm-addon-web-links": "^0.5.1"
   }
 }

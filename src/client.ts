@@ -267,6 +267,7 @@ class SftpClientCore {
             host.close();
         }
         this.failRequests(SftpStatusCode.CONNECTION_LOST, "Connection closed");
+        this._id = null;
     }
 
     private failRequests(code: SftpStatusCode, message: string): void {
@@ -775,6 +776,11 @@ export class SftpClient extends SftpClientCore {
     constructor(term: Terminal) {
         super();
         this._term = term;
+    }
+
+    echo(msg: string) {
+        if (this._term)
+            this._term.write(msg)
     }
 
     connect(address: string, options: any, callback: (err: SftpError) => void) {

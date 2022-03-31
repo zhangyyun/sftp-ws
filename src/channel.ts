@@ -145,6 +145,7 @@ class WebSocketChannel implements IChannel {
             err.code = err.errno = code;
             err.level = "ws";
             err.nativeCode = reason;
+            err.clean = e.wasClean;
 
             this._close(reason, err);
         };
