@@ -809,9 +809,11 @@ export class SftpClient extends SftpClientCore {
         this._term.onData(function (data: string) {
             channel.send(JSON.stringify({ type: "stdin", data: utf8_to_b64(data) }));
         });
-        this._term.onResize(function (data: { cols: number, rows: number }) {
+        function resize(data: { cols: number, rows: number }) {
             channel.send(JSON.stringify({ type: "resize", ...data }));
-        });
+        }
+        resize({cols: this._term.cols, rows: this._term.rows});
+        this._term.onResize(resize);
 
         this._init(channel, log, err => {
             if (err) {
@@ -852,6 +854,11 @@ export class SftpClient extends SftpClientCore {
 
     onclose(func: (err: SftpError) => void) {
         this._close = func;
+    }
+
+    disconnect(): void {
+        this.end();
+        this._bound = false;
     }
 
     list(path: string, callback: (err: SftpError, items: IItem[]) => void): void {
